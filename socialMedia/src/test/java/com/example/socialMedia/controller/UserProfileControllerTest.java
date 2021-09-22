@@ -5,6 +5,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import com.example.socialMedia.ResponseVo.FollowerRequestVo;
 import com.example.socialMedia.ResponseVo.FollowerResponseVo;
 import com.example.socialMedia.Services.IUserProfileService;
 import com.example.socialMedia.Services.UserProfileImpl;
@@ -56,10 +60,15 @@ public class UserProfileControllerTest {
 	public void testFollowUser() throws CustomException, Exception {
 		
 		when(userProfileServiceMock.addFollower(Mockito.any(UserFollower.class))).thenReturn(Mockito.any(UserFollower.class));
-		
-		ResponseEntity<FollowerResponseVo> vo = userProfileController.followUser(5, 6);
+		FollowerRequestVo reqVO= new FollowerRequestVo();
+		reqVO.setUserId(5);
+		List<Integer> list = new ArrayList<Integer>();
+		list.add(6);
+		list.add(7);
+		reqVO.setFollowerId(list);
+		ResponseEntity<List<FollowerResponseVo>> vo = userProfileController.followUser(reqVO);
 		assertEquals(HttpStatus.OK, vo.getStatusCode());
-		assertEquals("Follower added successfully", vo.getBody().getMessage());
+		assertEquals(2, vo.getBody().size());
 		
 	}
 	
@@ -72,9 +81,15 @@ public class UserProfileControllerTest {
 		when(userProfileServiceMock.addFollower(Mockito.any(UserFollower.class)))
 		.thenThrow(new CustomException("User is already following"));
 		
-		ResponseEntity<FollowerResponseVo> vo = userProfileController.followUser(5, 10);
-		assertEquals("ERROR", vo.getBody().getStatus());
-		assertEquals("User is already following", vo.getBody().getMessage());
+		FollowerRequestVo reqVO= new FollowerRequestVo();
+		reqVO.setUserId(5);
+		List<Integer> list = new ArrayList<Integer>();
+		list.add(6);
+		list.add(8);
+		reqVO.setFollowerId(list);
+		ResponseEntity<List<FollowerResponseVo>> vo = userProfileController.followUser(reqVO);
+		
+		assertEquals("User is already following", vo.getBody().get(0).getMessage());
 		
 	}
 	
@@ -82,10 +97,14 @@ public class UserProfileControllerTest {
 	public void testUnfollowUser() throws CustomException, Exception {
 		
 		when(userProfileServiceMock.removeFollower(Mockito.any(UserFollower.class))).thenReturn(Mockito.any(UserFollower.class));
-		
-		ResponseEntity<FollowerResponseVo> vo = userProfileController.unfollowUser(5, 6);
+		FollowerRequestVo reqVO= new FollowerRequestVo();
+		reqVO.setUserId(5);
+		List<Integer> list = new ArrayList<Integer>();
+		list.add(6);
+		reqVO.setFollowerId(list);
+		ResponseEntity<List<FollowerResponseVo>> vo = userProfileController.unfollowUser(reqVO);
 		assertEquals(HttpStatus.OK, vo.getStatusCode());
-		assertEquals("Follower removed successfully", vo.getBody().getMessage());
+		assertEquals("Follower removed successfully", vo.getBody().get(0).getMessage());
 		
 	}
 	
@@ -98,9 +117,14 @@ public class UserProfileControllerTest {
 		when(userProfileServiceMock.removeFollower(Mockito.any(UserFollower.class)))
 		.thenThrow(new CustomException("User is not Following, so cannot be removed"));
 		
-		ResponseEntity<FollowerResponseVo> vo = userProfileController.unfollowUser(5, 10);
-		assertEquals("ERROR", vo.getBody().getStatus());
-		assertEquals("User is not Following, so cannot be removed", vo.getBody().getMessage());
+		FollowerRequestVo reqVO= new FollowerRequestVo();
+		reqVO.setUserId(5);
+		List<Integer> list = new ArrayList<Integer>();
+		list.add(6);
+		reqVO.setFollowerId(list);
+		ResponseEntity<List<FollowerResponseVo>> vo = userProfileController.unfollowUser(reqVO);
+		
+		assertEquals("User is not Following, so cannot be removed", vo.getBody().get(0).getMessage());
 		
 	}
 	

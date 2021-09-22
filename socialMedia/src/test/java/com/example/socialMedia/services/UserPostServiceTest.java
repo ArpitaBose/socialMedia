@@ -17,6 +17,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.example.socialMedia.ResponseVo.PostRequestVO;
 import com.example.socialMedia.Services.UserPostService;
 import com.example.socialMedia.entity.UserPost;
 import com.example.socialMedia.exception.CustomException;
@@ -47,11 +48,21 @@ public class UserPostServiceTest {
 	public void testSavePost() throws CustomException {
 		UserPost updatedUserPost = new UserPost(0, "TEts", 12, Calendar.getInstance());
 		
-		when(postRepo.save(Mockito.any(UserPost.class))).thenReturn(updatedUserPost);
-		UserPost userPost = new UserPost(0, "TEts", 12, Calendar.getInstance());
-		userPostService.savePost(userPost);
+		PostRequestVO postReqVo = new PostRequestVO();
+		postReqVo.setCreatedUserId(12);
+		List<String> contentList = new ArrayList<String>();
+		contentList.add("TEts");
+		postReqVo.setContent(contentList);
 		
-		assertSame(updatedUserPost.getCreatedUserId(), userPost.getCreatedUserId());
+		//UserPost userPost = new UserPost(0, "TEts", 12, Calendar.getInstance());
+		List<UserPost> userPostList = new ArrayList<UserPost>();
+		userPostList.add(updatedUserPost);
+		
+		when(postRepo.save(Mockito.any(UserPost.class))).thenReturn(updatedUserPost);
+		
+		userPostService.savePost(postReqVo);
+		
+		assertSame(postReqVo.getCreatedUserId(), updatedUserPost.getCreatedUserId());
 	}
 	
 	@Test

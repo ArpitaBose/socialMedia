@@ -1,16 +1,18 @@
 package com.example.socialMedia.ResponseVo;
 
+import java.util.List;
+
 import com.example.socialMedia.entity.UserPost;
 
 public class SavePostResponseVo extends BaseResponse {
 	
-	UserPost userPost ;
+	List<UserPost> userPost ;
 
-	public UserPost getUserPost() {
+	public List<UserPost> getUserPost() {
 		return userPost;
 	}
 
-	public void setUserPost(UserPost userPost) {
+	public void setUserPost(List<UserPost> userPost) {
 		this.userPost = userPost;
 	}
 	

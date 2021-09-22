@@ -3,6 +3,7 @@ package com.example.socialMedia.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.example.socialMedia.ResponseVo.FeedResponseVo;
+import com.example.socialMedia.ResponseVo.PostRequestVO;
 import com.example.socialMedia.ResponseVo.SavePostResponseVo;
 import com.example.socialMedia.Services.IUserPostService;
 import com.example.socialMedia.entity.UserPost;
@@ -43,18 +45,29 @@ public class UserPostControllerTest {
 	@Test
 	public void testSavePost() throws CustomException {
 		
-		when(userPostService.savePost(Mockito.any(UserPost.class))).thenReturn(Mockito.any(UserPost.class));
+		when(userPostService.savePost(Mockito.any(PostRequestVO.class))).thenReturn(Mockito.any(List.class));
+		PostRequestVO reqVo = new PostRequestVO();
+		reqVo.setCreatedUserId(5);
+		List<String> list = new ArrayList<String>();
+		list.add("TEst");
+		reqVo.setContent(list);
 		
-		ResponseEntity<SavePostResponseVo> responseEntity = userPostController.savePost(1, "TEst");
+		ResponseEntity<SavePostResponseVo> responseEntity = userPostController.savePost(reqVo);
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals("Post Saved successfully", responseEntity.getBody().getMessage());
 	}
 	
 	@Test
 	public void testNegativeSavePost() throws CustomException {
-		when(userPostService.savePost(Mockito.any(UserPost.class))).thenThrow(new CustomException("Not a valid user"));
+		when(userPostService.savePost(Mockito.any(PostRequestVO.class))).thenThrow(new CustomException("Not a valid user"));
 		
-		ResponseEntity<SavePostResponseVo> responseEntity = userPostController.savePost(1, "TEst");
+		PostRequestVO reqVo = new PostRequestVO();
+		reqVo.setCreatedUserId(5);
+		List<String> list = new ArrayList<String>();
+		list.add("TEst");
+		reqVo.setContent(list);
+		
+		ResponseEntity<SavePostResponseVo> responseEntity = userPostController.savePost(reqVo);
 		assertEquals("ERROR", responseEntity.getBody().getStatus());
 		assertEquals("Not a valid user", responseEntity.getBody().getMessage());
 	}

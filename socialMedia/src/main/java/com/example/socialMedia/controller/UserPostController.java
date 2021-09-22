@@ -10,11 +10,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.socialMedia.ResponseVo.FeedResponseVo;
+import com.example.socialMedia.ResponseVo.PostRequestVO;
 import com.example.socialMedia.ResponseVo.SavePostResponseVo;
 import com.example.socialMedia.Services.IUserPostService;
 import com.example.socialMedia.entity.UserPost;
@@ -39,27 +41,27 @@ public class UserPostController {
 	 * @return
 	 */
 	@PostMapping("/savePost")
-	public ResponseEntity<SavePostResponseVo> savePost(@RequestParam("userId")int userId, @RequestParam("content")String content) {
+	
+	public ResponseEntity<SavePostResponseVo> savePost(@RequestBody PostRequestVO posts) {
 		final String methodName = "savePost";
 		
-		logger.info("USER ID: " + userId +  " " + methodName + " " + className);
+		logger.info("USER ID: " + posts.getCreatedUserId() +  " " + methodName + " " + className);
 		
 		SavePostResponseVo responseVo = new SavePostResponseVo();
 		try {
-			UserPost userPost = new UserPost();
-			userPost.setContent(content);
-			userPost.setCreatedUserId(userId);
-			UserPost updatePost = userPostService.savePost(userPost);
+
+			List<UserPost> updatePost = userPostService.savePost(posts);
 			
-			responseVo.setUserPost(updatePost);
+			
 			responseVo.setStatus("SUCCESS");
 			responseVo.setMessage("Post Saved successfully");
-			if(null != updatePost)
-				logger.info("Post added , id: " + updatePost.getPostId() +  " " + methodName + " " + className);
-			else
+			if(null != updatePost) {
+				responseVo.setUserPost(updatePost);
+				logger.info("Post added , id: " + updatePost.toString() +  " " + methodName + " " + className);
+			}else
 				logger.info("Post added , id: " + -1 +  " " + methodName + " " + className);
 		} catch (CustomException e) {
-			logger.error("Error in saving the post: " + userId +  " error: "+ e.getMessage() +
+			logger.error("Error in saving the post: " + posts.getCreatedUserId() +  " error: "+ e.getMessage() +
 					" " + methodName + " " + className);
 			responseVo.setStatus("ERROR");
 			responseVo.setMessage(e.getMessage());

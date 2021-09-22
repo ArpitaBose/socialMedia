@@ -28,7 +28,8 @@ public class StaticSetup {
 		
 		populateUserProfileList();
 		System.out.println("User Profiles");
-		userProfileList.stream().forEach(System.out::println);
+		//userProfileList.stream().forEach(System.out::println);
+		//userProfileList.stream().forEach();
 		
 //		System.out.println();
 //		System.out.println();

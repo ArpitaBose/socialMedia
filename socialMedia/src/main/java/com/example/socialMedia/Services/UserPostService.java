@@ -1,5 +1,6 @@
 package com.example.socialMedia.Services;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.socialMedia.ResponseVo.PostRequestVO;
 import com.example.socialMedia.controller.UserProfileController;
 import com.example.socialMedia.entity.UserPost;
 import com.example.socialMedia.exception.CustomException;
@@ -31,15 +33,33 @@ public class UserPostService implements IUserPostService {
 	 * Saving the post if the user is a valid user
 	 */
 	@Override
-	public UserPost savePost(UserPost userPost) throws CustomException {
+	public List<UserPost> savePost(PostRequestVO userRequestPost) throws CustomException {
 		final String methodName = "savePost";
 		
-		if(StaticSetup.isUserPresent(userPost.getCreatedUserId())) {
-			logger.info("USER ID: " + userPost.getCreatedUserId() + " is valid user " + " " + methodName + " " + className);
-			userPost.setPostId(StaticSetup.userPostList.size());
-			userPost.setCreatedTime(Calendar.getInstance());
-			UserPost updatedPost =  postRepo.save(userPost);
-			return updatedPost;
+		
+//		userPost.setContent(posts.getContent());
+		
+		
+		if(StaticSetup.isUserPresent(userRequestPost.getCreatedUserId())) {
+			logger.info("USER ID: " + userRequestPost.getCreatedUserId() + " is valid user " + " " + methodName + " " + className);
+			if(null != userRequestPost && null != userRequestPost.getContent() && !userRequestPost.getContent().isEmpty()) {
+				List<UserPost> userPostList = new ArrayList<UserPost>(); 
+				for(String content : userRequestPost.getContent()) {
+					UserPost userPost = new UserPost();
+					userPost.setCreatedUserId(userRequestPost.getCreatedUserId());
+					userPost.setPostId(StaticSetup.userPostList.size());
+					userPost.setCreatedTime(Calendar.getInstance());
+					userPost.setContent(content);
+					UserPost updatedPost =  postRepo.save(userPost);
+					userPostList.add(updatedPost);
+					
+				}
+				return userPostList;
+			} else {
+				throw new CustomException("Content is empty");
+			}
+		
+			
 		} else {
 			throw new CustomException("Not a valid user");
 		}
